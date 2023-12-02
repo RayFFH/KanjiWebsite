@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather in Tokyo</title>
+    <script defer src="script.js"></script>
+</head>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        margin: 0;
+        padding: 0;
+        background-image: url('/views/tokyoimage.jpg');
+        background-size: cover;
+        background-position: center;
+        color: black;
+    }
+
+    #header {
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        text-align: center;
+        margin-top: 10px;
+        background-color: rgba(255, 255, 255, 0.7);
+        font-size: 1.5em;
+    }
+
+    #buttons-container {
+        display: flex;
+        justify-content: center; /* Center the buttons */
+        margin-top: 10px;
+    }
+    #random-kanji {
+    font-size: 5em;
+    font-weight: bold; /* Adjust the font weight for a sharper look */
+    font-family: 'Arial', sans-serif; /* Use a specific font for a sharper appearance */
+    }
+
+    button {
+        background-color: #2ecc71;
+        color: white;
+        padding: 12px 24px;
+        font-size: 16px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    button:hover {
+        background-color: #27ae60;
+        transform: scale(1.05);
+    }
+
+    #h1-container {
+        margin-top: 20px;
+    }
+
+    #weather {
+        margin-top: 40px;
+    }
+
+    #random-kanji {
+        font-size: 5em;
+        color: white;
+    }
+
+    #kanji-tracking {
+        margin-top: 20px;
+        padding: 10px;
+        background-color: rgba(255, 255, 255, 0.712); 
+        overflow-y: auto; /* Add this line to make it scrollable */
+    }
+
+    #known-kanji-list {
+        list-style-type: none;
+        padding: 0;
+        font-size: 16px;
+    }
+
+    #account-container,
+    #login-container {
+        margin-top: 20px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        background-color: rgba(255, 255, 255, 0.7);
+    }
+    #level-text {
+    font-size: 24px; /* Adjust the font size as needed */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Use an elegant font */
+    font-weight: bold;
+    color: rgb(255, 255, 255); /* Set the color of the text */
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    z-index: 999;
+}
+    #level-description {
+        font-size: 12px; /* Adjust the font size as needed */
+        color: gray; /* Optional: Set the color */
+        margin-top: 5px; /* Optional: Add some space from the level text */
+    }
+    #username-display {
+    font-weight: bold;
+    color: white;
+}
+    
+</style>
+</head>
+<body>
+    <div id="username-display"></div>
+    <div id="level-text">Level: <span id="level">1</span><p id="level-description">After every 10 kanji you gain 1 level</p>
+    </div>
+    <div id="buttons-container">
+        <button type="button" onclick="logout()">Logout</button>
+    </div>
+
+    <div id="h1-container">
+        <h1>Weather in Tokyo</h1>
+    </div>
+
+    <div id="weather"></div>
+
+    <div id="random-kanji"></div>
+    <button type="button" id="recognize-button" onclick="recognizeKanji()">Recognize</button>
+    <button type="button" id="dont-recognize-button" onclick="dontRecognizeKanji()">Don't Recognize</button>
+</div>
+
+    <div id="kanji-tracking">
+        <h2>Your Recognized Kanji</h2>
+        <p id="kanji-description">Order - Kanji - Meaning - Reading</p>
+        <ul id="known-kanji-list"></ul>
+        
+    </div>
+
+    <div id="account-container">
+        <h2>Create an Account</h2>
+        <form id="account-form">
+            <label for="username">Username:</label>
+            <input type="text" id="username" required>
+            <br>
+            <label for="password">Password:</label>
+            <input type="password" id="password" required>
+            <br>
+            <button type="button" onclick="createAccount()">Create Account</button>
+        </form>
+    </div>
+
+    <div id="login-container">
+        <h2>Login</h2>
+        <form id="login-form">
+            <label for="login-username">Username:</label>
+            <input type="text" id="login-username" required>
+            <br>
+            <label for="login-password">Password:</label>
+            <input type="password" id="login-password" required>
+            <br>
+            <button type="button" onclick="login()">Login</button>
+        </form>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
