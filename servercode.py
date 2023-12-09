@@ -140,5 +140,72 @@ def recognize_kanji_route():
         # Log the exception for further analysis
         print(f"An error occurred: {str(e)}")
         return jsonify({'error': 'Internal Server Error'}), 500
+    
+
+@app.route('/users', methods=['POST'])
+def register_user():
+    try:
+        data = request.get_json()
+        username = data.get('username')
+        password = data.get('password')
+        print("Trying to creater user")
+        connection = create_db_connection("localhost", "root", "349dsahoDSI3:", "testdatabase")
+
+        if connection:
+            cursor = connection.cursor()
+
+            # Hash the password (using a secure method in production)
+            password_hash = hashlib.sha256(password.encode()).hexdigest()
+
+            # Insert user into the database
+            query = "INSERT INTO users (username, password_hash) VALUES (%s, %s)"
+            cursor.execute(query, (username, password_hash))
+
+            connection.commit()
+            cursor.close()
+            connection.close()
+
+            return jsonify(message='User created successfully', user_id=cursor.lastrowid), 201
+        else:
+            return jsonify(error='Internal Server Error'), 500
+    except Exception as e:
+        print(f"An error occurred during user registration: {e}")
+        return jsonify(error='Internal Server Error'), 500
+
+@app.route('/login', methods=['POST'])
+def login_user():
+    try:
+        data = request.get_json()
+        username = data.get('username')
+        password = data.get('password')
+
+        connection = create_db_connection("localhost", "root", "349dsahoDSI3:", "testdatabase")
+
+        if connection:
+            cursor = connection.cursor()
+
+            # Hash the provided password for comparison
+            password_hash = hashlib.sha256(password.encode()).hexdigest()
+
+            # Check if the user exists in the database
+            query = "SELECT * FROM users WHERE username = %s AND password_hash = %s"
+            cursor.execute(query, (username, password_hash))
+
+            user = cursor.fetchone()
+
+            if user:
+                cursor.close()
+                connection.close()
+                return jsonify(message='Login successful'), 200
+            else:
+                cursor.close()
+                connection.close()
+                return jsonify(error='Invalid username or password'), 401
+        else:
+            return jsonify(error='Internal Server Error'), 500
+    except Exception as e:
+        print(f"An error occurred during user login: {e}")
+        return jsonify(error='Internal Server Error'), 500
+    
 if __name__ == '__main__':
     app.run(port=5000)

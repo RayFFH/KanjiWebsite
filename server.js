@@ -4,6 +4,7 @@ const axios = require('axios');
 const app = express();
 const port = 3000;
 const path = require('path');
+const mysql = require('mysql2'); 
 //const { save_known_kanji, get_known_kanji } = require('./database');
 
 app.use(express.json());
@@ -26,6 +27,23 @@ app.use((req, res, next) => {
         next();
     });
 });
+function create_db_connection(host_name, user_name, user_password, db_name) {
+    // Create a connection pool
+    const pool = mysql.createPool({
+        host: host_name,
+        user: user_name,
+        password: user_password,
+        database: db_name,
+        waitForConnections: true,
+        connectionLimit: 10,
+        queueLimit: 0
+    });
+
+    // Return the pool for reuse
+    return pool.promise();
+}
+
+module.exports = create_db_connection;
 
 // Route to render the EJS file
 app.get('/', (req, res) => {
@@ -146,6 +164,76 @@ app.post('/dontRecognizeKanji', async (req, res) => {
     // Implement the logic for non-recognition of kanji
     // ...
 });
+
+app.post('/users', async (req, res) => {
+    try {
+        const { username, password } = req.body;
+
+        // Hash the password (using a secure method in production)
+        const passwordHash = require('crypto').createHash('sha256').update(password).digest('hex');
+
+        // Create a MySQL database connection
+        const connection = create_db_connection("localhost", "root", "349dsahoDSI3:", "testdatabase");
+
+        if (connection) {
+            // Use the 'connection' object to execute the query
+            const query = "INSERT INTO users (username, password_hash) VALUES (?, ?)";
+            connection.query(query, [username, passwordHash], (err, results) => {
+                if (err) {
+                    console.error(err.message);
+                    res.status(500).json({ error: 'Internal Server Error' });
+                } else {
+                    // results.insertId contains the last inserted ID
+                    res.status(201).json({ message: 'User created successfully', userId: results.insertId });
+                }
+                // Close the database connection
+                connection.end();
+            });
+        } else {
+            res.status(500).json({ error: 'Internal Server Error' });
+        }
+    } catch (error) {
+        console.error('An error occurred during user registration:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+ 
+app.get('/getUser', (req, res) => {
+    const username = req.query.username;
+
+    if (!username) {
+        return res.status(400).json({ error: 'Username parameter is required' });
+    }
+
+    // Create a database connection
+    const connection = createDBConnection();
+
+    // Connect to the database
+    connection.connect();
+
+    // Query to get user by username
+    const query = 'SELECT * FROM users WHERE username = ?';
+
+    // Execute the query
+    connection.query(query, [username], (err, results) => {
+        // Close the database connection
+        connection.end();
+
+        if (err) {
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+
+        if (results.length > 0) {
+            // User found, return the user object
+            return res.json(results[0]);
+        } else {
+            // User not found
+            return res.status(404).json({ error: 'User not found' });
+        }
+    });
+});
+
+
 app.listen(port, () => {
     console.log(`Server is running at http://localhost:${port}`);
 });

@@ -1,18 +1,26 @@
 // public/script.js
-function getCurrentUser() {
-    const username = localStorage.getItem('current_user');
-    if (username) {
-        console.log('User found:', username);
-        const userJSON = localStorage.getItem(username);
-        if (userJSON) {
-            console.log('User JSON:', userJSON);
-            return JSON.parse(userJSON);
+async function getCurrentUser() {
+    try {
+        const username = localStorage.getItem('current_user');
+        if (username) {
+            console.log('User found:', username);
+
+            // Make a request to the server to get user information
+            const response = await fetch(`/getUser?username=${username}`);
+            if (response.ok) {
+                const userJSON = await response.json();
+                console.log('User JSON:', userJSON);
+                return userJSON;
+            } else {
+                console.error('Failed to fetch user information:', response.statusText);
+                return null;
+            }
         } else {
-            console.error('No user JSON found for username:', username);
+            console.log('No user found.');
             return null;
         }
-    } else {
-        console.log('No user found.');
+    } catch (error) {
+        console.error('Error fetching user information:', error);
         return null;
     }
 }
@@ -87,19 +95,73 @@ function generateUniqueId() {
     const randomNum = Math.floor(Math.random() * 1000); // You can adjust the range as needed
     return `${timestamp}_${randomNum}`;
 }
-function storeUser(user) {
-    // Generate a unique user ID
-    const userId = generateUniqueId();
+// function storeUser(user) {
+
+//     fetch('http://localhost:3000/api/users', {
+//       method: 'POST',
+//       headers: {
+//          'Content-Type': 'application/json',
+//       },
+//       body: JSON.stringify({ user.username, password }),
+//    })
+//       .then(response => response.json())
+//       .then(data => {
+//          console.log(data);
+//          alert('User registered successfully!');
+//       })
+//       .catch(error => {
+//          console.error('Error:', error);
+//          alert('Error registering user. Please try again.');
+//       });
+// });
+
+//     try {
+//         const response = await fetch('/storeUser');
+//         const data = await response.json();
+//         console.log('Stored User:', data.user);
+
+//     } catch (error) {
+//         console.error('Error getting the user data:', error);
+//         // Handle the error
+//     }
+//     // Generate a unique user ID
+//     //const userId = generateUniqueId();
     
-    // Attach the user ID to the user object
-    user.id = userId;
+//     // Attach the user ID to the user object
+//     // user.id = userId;
 
-    // Store the user in local storage using the user ID as the key
-    localStorage.setItem(userId, JSON.stringify(user));
+//     // // Store the user in local storage using the user ID as the key
+//     // localStorage.setItem(userId, JSON.stringify(user));
 
-    // Set the current user in local storage
-    setCurrentUser(userId);
+//     // Set the current user in local storage
+//     setCurrentUser(userId);
+// }
+
+async function storeUser(username, password) {
+    try {
+        const response = await fetch('http://localhost:3000/users', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                username: username,
+                password: password,
+            }),
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            console.log('Stored User:', data.user);
+        } else {
+            console.error('Failed to store user:', response.statusText);
+        }
+    } catch (error) {
+        console.error('Error getting the user data:', error);
+        // Handle the error
+    }
 }
+
 function createAccount() {
     const usernameInput = document.getElementById('username');
     const passwordInput = document.getElementById('password');
@@ -124,7 +186,7 @@ function createAccount() {
     };
 
     // Store the user in local storage
-    storeUser(newUser);
+    storeUser(usernameInput.value, passwordInput.value);
 
     // Set the current user by user ID
     setCurrentUser(newUser.id);
@@ -139,7 +201,7 @@ function createAccount() {
 
 // Add the rest of your functions here
 // ...
-function login() {
+async function login() {
     const loginUsernameInput = document.getElementById('login-username');
     const loginPasswordInput = document.getElementById('login-password');
 
@@ -149,18 +211,40 @@ function login() {
         return;
     }
 
-    // Check if the user exists
-    const existingUser = getUserByUsername(loginUsernameInput.value);
-    if (!existingUser || existingUser.password !== loginPasswordInput.value) {
-        alert('Invalid username or password. Please try again.');
-        return;
-    }
+    try {
+        const response = await fetch('http://localhost:3000/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                username: loginUsernameInput.value,
+                password: loginPasswordInput.value,
+            }),
+        });
 
-    // Hide the account and login boxes
-    hideAccountAndLoginBoxes();
-    setCurrentUser(existingUser.username);
-    // Display a welcome message
-    displayWelcomeMessage(existingUser.username);
+        if (response.ok) {
+            // Successfully logged in
+            const data = await response.json();
+            console.log('Login successful:', data.message);
+
+            // Hide the account and login boxes
+            hideAccountAndLoginBoxes();
+
+            // Set the current user by username
+            setCurrentUser(loginUsernameInput.value);
+
+            // Display a welcome message
+            displayWelcomeMessage(loginUsernameInput.value);
+        } else if (response.status === 401) {
+            // Invalid username or password
+            alert('Invalid username or password. Please try again.');
+        } else {
+            console.error('Failed to login:', response.statusText);
+        }
+    } catch (error) {
+        console.error('Error during login:', error);
+    }
 }
 function hideAccountAndLoginBoxes() {
     const accountContainer = document.getElementById('account-container');
