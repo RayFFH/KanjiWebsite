@@ -5,8 +5,14 @@ const app = express();
 const port = 3000;
 const path = require('path');
 const mysql = require('mysql2'); 
+const bodyParser = require('body-parser');
+const crypto = require('crypto');
 //const { save_known_kanji, get_known_kanji } = require('./database');
 
+const { getUserByUsername } = require('./database-module');
+
+const cors = require('cors');
+app.use(cors());
 app.use(express.json());
 app.set('view engine', 'ejs'); // Set EJS as the view engine
 app.set('views', path.join(__dirname, 'views'));
@@ -165,73 +171,48 @@ app.post('/dontRecognizeKanji', async (req, res) => {
     // ...
 });
 
-app.post('/users', async (req, res) => {
-    try {
-        const { username, password } = req.body;
 
-        // Hash the password (using a secure method in production)
-        const passwordHash = require('crypto').createHash('sha256').update(password).digest('hex');
-
-        // Create a MySQL database connection
-        const connection = create_db_connection("localhost", "root", "349dsahoDSI3:", "testdatabase");
-
-        if (connection) {
-            // Use the 'connection' object to execute the query
-            const query = "INSERT INTO users (username, password_hash) VALUES (?, ?)";
-            connection.query(query, [username, passwordHash], (err, results) => {
-                if (err) {
-                    console.error(err.message);
-                    res.status(500).json({ error: 'Internal Server Error' });
-                } else {
-                    // results.insertId contains the last inserted ID
-                    res.status(201).json({ message: 'User created successfully', userId: results.insertId });
-                }
-                // Close the database connection
-                connection.end();
-            });
-        } else {
-            res.status(500).json({ error: 'Internal Server Error' });
-        }
-    } catch (error) {
-        console.error('An error occurred during user registration:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
-});
- 
-app.get('/getUser', (req, res) => {
+app.get('/getUser', async (req, res) => {
     const username = req.query.username;
 
-    if (!username) {
-        return res.status(400).json({ error: 'Username parameter is required' });
+    // Use the getUserByUsername function to get user information
+    const user = await getUserByUsername(username);
+
+    if (user) {
+        res.status(200).json(user);
+    } else {
+        res.status(404).json({ error: 'User not found' });
     }
-
-    // Create a database connection
-    const connection = createDBConnection();
-
-    // Connect to the database
-    connection.connect();
-
-    // Query to get user by username
-    const query = 'SELECT * FROM users WHERE username = ?';
-
-    // Execute the query
-    connection.query(query, [username], (err, results) => {
-        // Close the database connection
-        connection.end();
-
-        if (err) {
-            return res.status(500).json({ error: 'Internal Server Error' });
-        }
-
-        if (results.length > 0) {
-            // User found, return the user object
-            return res.json(results[0]);
-        } else {
-            // User not found
-            return res.status(404).json({ error: 'User not found' });
-        }
-    });
 });
+
+app.post('/login', (req, res) => {
+    const connection = create_db_connection("localhost", "root", "349dsahoDSI3:", "testdatabase");
+
+    const { username, password } = req.body;
+
+    // Hash the password (using a secure method in production)
+    const passwordHash = crypto.createHash('sha256').update(password).digest('hex');
+  
+    // Check if the user exists
+    const query = 'SELECT * FROM users WHERE username = ? AND password_hash = ?';
+    connection.query(query, [username, passwordHash], (err, results) => {
+      if (err) {
+        console.error('Error executing login query:', err);
+        res.status(500).json({ error: 'Internal Server Error' });
+      } else {
+        if (results.length > 0) {
+          // User authenticated successfully
+          res.status(200).json({ message: 'Login successful', user: results[0] });
+        } else {
+          // Incorrect username or password
+          res.status(401).json({ error: 'Invalid username or password' });
+        }
+      }
+  
+      // Close the connection after the query is done
+      connection.end();
+    });
+  });
 
 
 app.listen(port, () => {

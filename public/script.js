@@ -77,10 +77,11 @@ async function getRandomKanji() {
 }
 // Add the rest of your client-side JavaScript code here
 // ...
-function checkLoggedInUser() {
-    const currentUser = getCurrentUser();
-
-    if (currentUser) {
+async function checkLoggedInUser() {
+    const currentUser = await getCurrentUser();
+    console.log(currentUser)
+    if (currentUser !== null && currentUser !== undefined) {
+        console.log("This is the current user", currentUser)
         // Hide the account and login boxes
         hideAccountAndLoginBoxes();
 
