@@ -4,6 +4,7 @@ from random import choice
 from Database import table_select, create_db_connection,save_known_kanji, get_known_kanji
 from flask_cors import CORS
 import random
+import pymysql
 
 app = Flask(__name__,template_folder='public')
 CORS(app) 
@@ -14,6 +15,24 @@ CITY = 'TOKYO'
 
 def kelvin_to_celsius(kelvin):
     return kelvin - 273.15
+
+def get_username_by_id(user_id):
+    # Establish a database connection
+    connection = create_db_connection("localhost", "root", "349dsahoDSI3:", "testdatabase")
+
+    try:
+        with connection.cursor() as cursor:
+            # Execute the SQL query to retrieve the username by user_id
+            sql = "SELECT username FROM users WHERE id = %s"
+            cursor.execute(sql, (user_id,))
+            result = cursor.fetchone()
+
+            if result:
+                return result[0]  # Return the username
+            else:
+                return None  # User not found
+    finally:
+        connection.close()
 
 @app.route('/weather', methods=['GET'])
 def get_weather():
@@ -207,5 +226,22 @@ def login_user():
         print(f"An error occurred during user login: {e}")
         return jsonify(error='Internal Server Error'), 500
     
+
+@app.route('/getUsername', methods=['GET'])
+def get_username():
+    # Get the user_id from the request parameters
+    user_id = request.args.get('user_id')
+
+    if user_id is not None:
+        # Call the function to get the username
+        username = get_username_by_id(user_id)
+
+        if username is not None:
+            return jsonify(username=username)
+        else:
+            return jsonify(error='User not found'), 404
+    else:
+        return jsonify(error='Missing user_id parameter'), 400
+
 if __name__ == '__main__':
     app.run(port=5000)

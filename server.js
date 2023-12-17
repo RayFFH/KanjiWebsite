@@ -179,7 +179,26 @@ app.get('/getUser', async (req, res) => {
     const user = await getUserByUsername(username);
 
     if (user) {
-        res.status(200).json(user);
+        try {
+            // Send a request to the Python server to get the username
+            const pythonResponse = await axios.get(`http://localhost:5000/getUsername?username=${username}`);
+            
+            if (pythonResponse.status === 200) {
+                const pythonUsername = pythonResponse.data;
+                console.log('Username from Python:', pythonUsername);
+
+                // Include the Python username in the response
+                const responseUser = { ...user, pythonUsername };
+
+                res.status(200).json(responseUser);
+            } else {
+                console.error('Failed to fetch username from Python:', pythonResponse.statusText);
+                res.status(500).json({ error: 'Internal Server Error' });
+            }
+        } catch (error) {
+            console.error('Error fetching username from Python:', error);
+            res.status(500).json({ error: 'Internal Server Error' });
+        }
     } else {
         res.status(404).json({ error: 'User not found' });
     }
