@@ -5,12 +5,27 @@ async function getCurrentUser() {
         if (username) {
             console.log('User found:', username);
 
-            // Make a request to the server to get user information
-            const response = await fetch(`/getUser?username=${username}`);
+            // Make a GET request to the server to get user information
+            const response = await fetch(`/getUser?username=${username}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
             if (response.ok) {
                 const userJSON = await response.json();
                 console.log('User JSON:', userJSON);
-                return userJSON;
+                // Hide the account and login boxes
+                hideAccountAndLoginBoxes();
+
+                // Set the current user by username
+                setCurrentUser(userJSON.username);
+
+                // Display a welcome message
+                displayWelcomeMessage(userJSON.username);    
+
+                return userJSON.username;
             } else {
                 console.error('Failed to fetch user information:', response.statusText);
                 return null;
@@ -25,11 +40,12 @@ async function getCurrentUser() {
     }
 }
 
+
 document.addEventListener('DOMContentLoaded', getTokyoWeather);
 
 document.addEventListener('DOMContentLoaded', function () {
     // Check if the user is already logged in
-    checkLoggedInUser();
+    //checkLoggedInUser();
 
     // generateRandomKanji();
     getRandomKanji();
@@ -213,7 +229,7 @@ async function login() {
     }
 
     try {
-        const response = await fetch('http://localhost:3000/login', {
+        const response = await fetch('http://localhost:3000/getUserLogin', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

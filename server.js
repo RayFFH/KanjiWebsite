@@ -9,7 +9,7 @@ const bodyParser = require('body-parser');
 const crypto = require('crypto');
 //const { save_known_kanji, get_known_kanji } = require('./database');
 
-const { getUserByUsername } = require('./database-module');
+//const { getUserByUsername } = require('./database-module');
 
 const cors = require('cors');
 app.use(cors());
@@ -175,63 +175,119 @@ app.post('/dontRecognizeKanji', async (req, res) => {
 app.get('/getUser', async (req, res) => {
     const username = req.query.username;
 
-    // Use the getUserByUsername function to get user information
-    const user = await getUserByUsername(username);
+    // Send a request to the Python server to get the username
+    try {
+        const pythonResponse = await axios.get(`http://localhost:5000/getUsername?username=${username}`);
+        
+        if (pythonResponse.status === 200) {
+            const pythonUsername = pythonResponse.data;
+            console.log('Username from Python:', pythonUsername);
 
-    if (user) {
-        try {
-            // Send a request to the Python server to get the username
-            const pythonResponse = await axios.get(`http://localhost:5000/getUsername?username=${username}`);
-            
-            if (pythonResponse.status === 200) {
-                const pythonUsername = pythonResponse.data;
-                console.log('Username from Python:', pythonUsername);
-
-                // Include the Python username in the response
-                const responseUser = { ...user, pythonUsername };
-
-                res.status(200).json(responseUser);
-            } else {
-                console.error('Failed to fetch username from Python:', pythonResponse.statusText);
-                res.status(500).json({ error: 'Internal Server Error' });
-            }
-        } catch (error) {
-            console.error('Error fetching username from Python:', error);
+            res.status(200).json({ username: pythonUsername });
+        } else {
+            console.error('Failed to fetch username from Python:', pythonResponse.statusText);
             res.status(500).json({ error: 'Internal Server Error' });
         }
-    } else {
-        res.status(404).json({ error: 'User not found' });
+    } catch (error) {
+        console.error('Error fetching username from Python:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
     }
 });
 
-app.post('/login', (req, res) => {
-    const connection = create_db_connection("localhost", "root", "349dsahoDSI3:", "testdatabase");
+app.post('/getUserLogin', async (req, res) => {
+    const username = req.body.username;
+    const password = req.body.username;
 
-    const { username, password } = req.body;
+    // Send a request to the Python server to get the username
+    try {
+        const pythonResponse = await axios.post(`http://localhost:5000/getLogin`, {
+            username,
+            password,
+        });
+        
+        if (pythonResponse.status === 200) {
+            const pythonUsername = pythonResponse.data;
+            console.log('Username from Python:', pythonUsername);
 
-    // Hash the password (using a secure method in production)
-    const passwordHash = crypto.createHash('sha256').update(password).digest('hex');
-  
-    // Check if the user exists
-    const query = 'SELECT * FROM users WHERE username = ? AND password_hash = ?';
-    connection.query(query, [username, passwordHash], (err, results) => {
-      if (err) {
-        console.error('Error executing login query:', err);
-        res.status(500).json({ error: 'Internal Server Error' });
-      } else {
-        if (results.length > 0) {
-          // User authenticated successfully
-          res.status(200).json({ message: 'Login successful', user: results[0] });
+            res.status(200).json({ username: pythonUsername });
         } else {
-          // Incorrect username or password
-          res.status(401).json({ error: 'Invalid username or password' });
+            console.error('Failed to fetch username from Python:', pythonResponse.statusText);
+            res.status(500).json({ error: 'Internal Server Error' });
         }
-      }
+    } catch (error) {
+        console.error('Error fetching username from Python:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+// app.post('/login', (req, res) => {
+//     const connection = create_db_connection("localhost", "root", "349dsahoDSI3:", "testdatabase");
+
+//     const { username, password } = req.body;
+
+//     // Hash the password (using a secure method in production)
+//     const passwordHash = crypto.createHash('sha256').update(password).digest('hex');
   
-      // Close the connection after the query is done
-      connection.end();
-    });
-  });
+//     // Check if the user exists
+//     const query = 'SELECT * FROM users WHERE username = ? AND password_hash = ?';
+//     connection.query(query, [username, passwordHash], (err, results) => {
+//       if (err) {
+//         console.error('Error executing login query:', err);
+//         res.status(500).json({ error: 'Internal Server Error' });
+//       } else {
+//         if (results.length > 0) {
+//           // User authenticated successfully
+//           res.status(200).json({ message: 'Login successful', user: results[0] });
+//         } else {
+//           // Incorrect username or password
+//           res.status(401).json({ error: 'Invalid username or password' });
+//         }
+//       }
+  
+//       // Close the connection after the query is done
+//       connection.end();
+//     });
+//   });
+
+app.post('/users', async (req, res) => {
+    try {
+        const { username, password } = req.body;
+
+        // Make a request to the Python Flask function for user authentication
+        const pythonResponse = await axios.post('http://localhost:5000/users', {
+            username,
+            password,
+        });
+
+        // Forward the response from the Python Flask function to the client
+        res.status(pythonResponse.status).json(pythonResponse.data);
+    } catch (error) {
+        console.error('Error during login:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+// async function getUserByUsername(username) {
+//     const connection = create_db_connection("localhost", "root", "349dsahoDSI3:", "testdatabase");
+
+    
+
+//     if (connection) {
+//         // Implement logic to query the database for the user by username
+//         // ...
+
+//         // For example, you might use a SQL query to fetch the user
+//         const query = "SELECT * FROM users WHERE username = ?";
+//         const [user] = await connection.execute(query, [username]);
+
+//         connection.end();
+
+//         return user;
+//     } else {
+//         // Handle the case where the database connection fails
+//         return null;
+//     }
+// }
 
 
 app.listen(port, () => {

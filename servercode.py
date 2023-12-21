@@ -4,7 +4,8 @@ from random import choice
 from Database import table_select, create_db_connection,save_known_kanji, get_known_kanji
 from flask_cors import CORS
 import random
-import pymysql
+import hashlib
+# import pymysql
 
 app = Flask(__name__,template_folder='public')
 CORS(app) 
@@ -22,15 +23,23 @@ def get_username_by_id(user_id):
 
     try:
         with connection.cursor() as cursor:
+            print("Retrieving usernmae" + user_id)
             # Execute the SQL query to retrieve the username by user_id
-            sql = "SELECT username FROM users WHERE id = %s"
+            # sql = "SELECT username FROM users WHERE id = %s"
+            sql = "SELECT * FROM users WHERE username = %s"
             cursor.execute(sql, (user_id,))
             result = cursor.fetchone()
 
             if result:
-                return result[0]  # Return the username
+                print("the user returned")
+                print(result[1])
+                return result[1]  # Return the username
             else:
+                print("no user")
                 return None  # User not found
+    except Exception as e:
+        print(f"Error in get_username_by_id: {e}")
+        return None
     finally:
         connection.close()
 
@@ -116,7 +125,7 @@ def get_known_kanji_route():
     try:
         # Get user_id from the request
         user_id = request.args.get('user_id')
-        print(user_id)
+        print("knownkanjiuserid" + user_id)
         # Fetch known kanji from the database
         connection = create_db_connection("localhost", "root", "349dsahoDSI3:", "testdatabase")
         known_kanji_list = get_known_kanji(connection, user_id)
@@ -191,7 +200,7 @@ def register_user():
         print(f"An error occurred during user registration: {e}")
         return jsonify(error='Internal Server Error'), 500
 
-@app.route('/login', methods=['POST'])
+@app.route('/getLogin', methods=['POST'])
 def login_user():
     try:
         data = request.get_json()
@@ -205,7 +214,7 @@ def login_user():
 
             # Hash the provided password for comparison
             password_hash = hashlib.sha256(password.encode()).hexdigest()
-
+    
             # Check if the user exists in the database
             query = "SELECT * FROM users WHERE username = %s AND password_hash = %s"
             cursor.execute(query, (username, password_hash))
@@ -230,8 +239,8 @@ def login_user():
 @app.route('/getUsername', methods=['GET'])
 def get_username():
     # Get the user_id from the request parameters
-    user_id = request.args.get('user_id')
-
+    user_id = request.args.get('username')
+    print("here"+ user_id)
     if user_id is not None:
         # Call the function to get the username
         username = get_username_by_id(user_id)
@@ -239,7 +248,7 @@ def get_username():
         if username is not None:
             return jsonify(username=username)
         else:
-            return jsonify(error='User not found'), 404
+             return jsonify(message='User not found'), 200 
     else:
         return jsonify(error='Missing user_id parameter'), 400
 
