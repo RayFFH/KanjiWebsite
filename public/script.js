@@ -20,12 +20,12 @@ async function getCurrentUser() {
                 hideAccountAndLoginBoxes();
 
                 // Set the current user by username
-                setCurrentUser(userJSON.username);
+                setCurrentUser(username);
 
                 // Display a welcome message
-                displayWelcomeMessage(userJSON.username);    
+                displayWelcomeMessage(username);    
 
-                return userJSON.username;
+                return username;
             } else {
                 console.error('Failed to fetch user information:', response.statusText);
                 return null;
@@ -322,7 +322,7 @@ function logout() {
 // }
 async function saveKnownKanji(kanji) {
     try {
-        const currentUser = getCurrentUser();
+        const currentUser = await getCurrentUser();
         if (currentUser) {
             console.log('yooooo');
             // Make a request to the server to save known kanji
@@ -332,7 +332,7 @@ async function saveKnownKanji(kanji) {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    user_id: currentUser.id,  // Use the actual user ID here
+                    user_id: currentUser,  // Use the actual user ID here
                     kanji: kanji,
                 }),
             });
@@ -352,11 +352,11 @@ async function saveKnownKanji(kanji) {
 
 async function getKnownKanji() {
     try {
-        const currentUser = getCurrentUser();
+        const currentUser = await getCurrentUser();
         if (currentUser) {
             // Make a request to the server to fetch known kanji
-            //console.log(current)
-            const response = await fetch(`/getKnownKanji?user_id=${currentUser.id}`, {
+            console.log("current user now: " + currentUser)
+            const response = await fetch(`/getKnownKanji?user_id=${currentUser}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -409,14 +409,14 @@ async function recognizeKanji() {
         const kanjiInfo = JSON.parse(randomKanjiElement.getAttribute('data-kanji-info'));
 
         // Get the current user
-        const currentUser = getCurrentUser();
+        const currentUser = await getCurrentUser();
 
         console.log(randomKanji)
         console.log(kanjiInfo + "kanjiinfo")
         console.log('Current User:', currentUser);
         if (currentUser) {
             // Make a request to the server to recognize and save known kanji
-            console.log('Request Payload:', JSON.stringify({ user_id: currentUser.id, random_kanji: kanjiInfo }));
+            console.log('Request Payload:', JSON.stringify({ user_id: currentUser, random_kanji: kanjiInfo }));
 
 
             //Fetch a new random kanji
@@ -432,7 +432,7 @@ async function recognizeKanji() {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    user_id: currentUser.id,
+                    user_id: currentUser,
                     random_kanji: kanjiInfo,
                 }),
             });
@@ -455,12 +455,15 @@ async function recognizeKanji() {
 }
 
 // Function to handle non-recognition of kanji
-async function dontRecognizeKanji() {
+// async function dontRecognizeKanji() {
+//     hideAccountAndLoginBoxes();
     
-}
+// }
 
-function dontRecognizeKanji() {
-    location.reload(); // Refresh the page
+async function dontRecognizeKanji() {
+    //location.reload(); // Refresh the page
+    await getRandomKanji();
+    //hideAccountAndLoginBoxes();
 }
 
 function updateLevel(knownKanjiCount) {
