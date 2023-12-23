@@ -70,7 +70,8 @@ app.get('/getWeather', async (req, res) => {
 app.get('/getRandomKanji', async (req, res) => {
     try {
         const response = await axios.get('http://localhost:5000/getRandomKanji');
-        res.json(response.data);
+        const { random_kanji, random_sentence } = response.data;
+        res.json({ random_kanji, random_sentence });
     } catch (error) {
         console.error('Error fetching random kanji data:', error);
         res.status(500).send('Internal Server Error');
@@ -288,6 +289,22 @@ app.post('/users', async (req, res) => {
 //         return null;
 //     }
 // }
+app.get('/getNHKNews', async (req, res) => {
+    try {
+        // Assuming you have the current kanji available in req.query.current_kanji
+        const currentKanji = req.query.randomKanji;
+        console.log("HERHERHEHSHHERRHE"+ currentKanji)
+        // Make a GET request to the Flask server to get NHK news
+        const response = await axios.get(`http://localhost:5000/getNHKNews?current_kanji=${currentKanji}`);
+
+        // Forward the NHK news data to the client
+        res.status(response.status).json(response.data);
+    } catch (error) {
+        console.error('Error fetching NHK news:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
 
 
 app.listen(port, () => {

@@ -14,10 +14,10 @@
         text-align: center;
         margin: 0;
         padding: 0;
-        background-image: url('/views/tokyoimage.jpg');
+        /* background-image: url('/views/tokyoimage.jpg'); */
         background-size: cover;
         background-position: center;
-        color: black;
+        background-color: #333;
     }
 
     #header {
@@ -31,8 +31,9 @@
     }
 
     #buttons-container {
-        display: flex;
-        justify-content: center; /* Center the buttons */
+        /* display: flex;
+        justify-content: space-between; Adjusted to distribute buttons */
+        align-items: center; /* Center vertically */
         margin-top: 10px;
     }
     #random-kanji {
@@ -42,7 +43,7 @@
     }
 
     button {
-        background-color: #2ecc71;
+        background-color: #28a745;
         color: white;
         padding: 12px 24px;
         font-size: 16px;
@@ -53,7 +54,7 @@
     }
 
     button:hover {
-        background-color: #27ae60;
+        background-color: rgb(30, 142, 77);
         transform: scale(1.05);
     }
 
@@ -73,7 +74,7 @@
     #kanji-tracking {
         margin-top: 20px;
         padding: 10px;
-        background-color: rgba(255, 255, 255, 0.712); 
+        /* background-color: rgba(255, 255, 255, 0.712);  */
         overflow-y: auto; /* Add this line to make it scrollable */
     }
 
@@ -134,90 +135,176 @@
     font-weight: bold;
     color: white;
 }
+    .hidden {
+        display: none;
+    }
+    #header-container {
+        /* New style for the black header container */
+        background-color: black;
+        padding: 10px;
+        text-align: center;
+        color: white;
+    }
 
-    
+    #header-buttons {
+        /* Style for the buttons within the header */
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    #user-info {
+        /* Style for the user information */
+        display: flex;
+        justify-content: space-between;
+        padding: 10px;
+        color: white;
+    }
+    #user-card {
+        /* Style for the Bootstrap card */
+        width: 18rem;
+        margin-right: 10px;
+        background-color: black;
+    }
+
+    #user-card-body {
+        /* Style for the card body */
+        text-align: center;
+        background-color: black;
+    }
+    #title-display {
+    font-weight: bold;
+    color: white;
+}
+#recognized-kanji-card {
+    width: 18rem;
+    margin-top: 20px;
+    background-color: black; /* Set the background color to black */
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+#random-sentence-card {
+    height: 200px; /* Adjust the height as needed */
+    overflow-y: auto; /* Add this line to make it scrollable if the content exceeds the height */
+    margin-top: 20px;
+    padding: 10px;
+    background-color: black;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    color: white;
+}
+#nhk-news-card {
+        margin-top: 20px;
+        padding: 10px;
+        background-color: white;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+    }
+
+    /* Style for the NHK News section */
+    #nhk-news {
+        color: black; /* Set the text color to black */
+    }
 </style>
 </head>
 <body>
-    <div class="about-container">
-        <!-- <h3>Hey, I'm Phoenix. Initially, I started as an electronic engineer, but around a year ago, I became more interested
-            in software engineering. What excites me about software engineering is how it allows you to create something unique
-            and distribute it around the world. I've always been a more creative person and want to translate that into code.
-            Another ambition of mine is to experience the world and live in countries that I've always wanted to go to. Software
-            engineering is truly a worldwide profession that allows people to do careers across the globe. I'm fully invested in becoming
-            a software engineer and I'm enjoying learning something new everday. Email:phoenix222smart@gmail.com
-        </h3> -->
-    <div id="username-display"></div>
-    <div id="level-text">Level: <span id="level">1</span><p id="level-description">After every 10 kanji you gain 1 level</p>
-    </div>
-    <div id="buttons-container">
-        <button type="button" onclick="logout()">Logout</button>
-    </div>
 
-    <div id="h1-container">
-        <h1>Weather in Tokyo</h1>
-    </div>
-
-    <div id="weather"></div>
-
-    <div id="random-kanji"></div>
-    <button type="button" id="recognize-button" onclick="recognizeKanji()">Recognize</button>
-    <button type="button" id="dont-recognize-button" onclick="dontRecognizeKanji()">Don't Recognize</button>
-</div>
-
-    <div id="kanji-tracking">
-        <h2>Your Recognized Kanji</h2>
-        <p id="kanji-description">Order - Kanji - Meaning - Reading</p>
-        <ul id="known-kanji-list"></ul>
     
-    </div>   
-    <div class="container">
+    <div class="container-fluid" id="header-container">
         <div class="row">
-            <div class="col"></div>
-                <div id="account-container">
-                    <h2>Create an Account</h2>
-                    <form id="account-form">
-                        <label for="username">Username:</label>
-                        <input type="text" id="username" required>
-                        <br>
-                        <label for="password">Password:</label>
-                        <input type="password" id="password" required>
-                        <br>
-                        <button type="button" onclick="createAccount()">Create Account</button>
-                    </form>
-                </div>
-            <div class="col"></div>
-            <div id="login-container">
-                <h2>Login</h2>
-                <form id="login-form">
-                    <label for="login-username">Username:</label>
-                    <input type="text" id="login-username" required>
-                    <br>
-                    <label for="login-password">Password:</label>
-                    <input type="password" id="login-password" required>
-                    <br>
-                    <button type="button" onclick="login()">Login</button>
-                </form>
-            </div>    
-
+            <div class="col-lg-12" id="header-buttons">
+                <button id="loginButton" class="btn btn-secondary" onclick="window.location.href='login.html'">Login</button>
+                <button id="createAccountButton" class="btn btn-secondary ml-2" onclick="window.location.href='create-account.html'">Create Account</button>
+                <button id="logoutButton" class="btn btn-secondary ml-2 hidden" onclick="logout()">Logout</button>
+            </div>
+            <div class="col">
+                <h3 id="title-display" class="text-center">Kanji Learner</h3>
+            </div>
         </div>
     </div>
 
+        <!-- Welcome message and level on the same row -->
+        <!-- <div id="user-info">
+            <div id="username-display"></div>
+            <div id="level-text" class="hidden">Level: <span id="level">1</span><p id="level-description">After every 10 kanji you gain 1 level</p></div>
+        </div> -->
+    </div>
 
-    <!-- <div id="login-container">
-        <h2>Login</h2>
-        <form id="login-form">
-            <label for="login-username">Username:</label>
-            <input type="text" id="login-username" required>
-            <br>
-            <label for="login-password">Password:</label>
-            <input type="password" id="login-password" required>
-            <br>
-            <button type="button" onclick="login()">Login</button>
-        </form>
-    </div> -->
+    <div class="container-fluid">
+        <div class="about-container">
+            <!-- <h3>Hey, I'm Phoenix. Initially, I started as an electronic engineer, but around a year ago, I became more interested
+                in software engineering. What excites me about software engineering is how it allows you to create something unique
+                and distribute it around the world. I've always been a more creative person and want to translate that into code.
+                Another ambition of mine is to experience the world and live in countries that I've always wanted to go to. Software
+                engineering is truly a worldwide profession that allows people to do careers across the globe. I'm fully invested in becoming
+                a software engineer and I'm enjoying learning something new everday. Email:phoenix222smart@gmail.com
+            </h3> -->
+        </div>
+
+        <!-- <div id="h1-container">
+            <h1>Weather in Tokyo</h1>
+        </div>
+
+        <div id="weather"></div> -->
+
+        <div id="random-kanji"></div>
+        <button type="button" id="recognize-button" onclick="recognizeKanji()">Recognize</button>
+        <button type="button" id="dont-recognize-button" onclick="dontRecognizeKanji()">Don't Recognize</button>
+    </div>
+    <div class="container-fluid">
+        <div class="card bg-dark text-white ml-auto" id="user-card-container" style="width: 250px;">
+            <div class="card-body" id="user-card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h4 id="username-card-display"></h4>
+                    <span id="card-level-text" class="hidden">Level: <span id="level">1</span></span>
+                </div>
+                <div class="progress mt-3">
+                    <div id="level-progress" class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+
+        <div class="container-fluid">
+            <div class="row justify-content-center mt-5">
+                <div class="col-md-12">
+                    <div class="bg-dark text-white" id="random-sentence-container">
+                        <div class="text-center" id="random-sentence-body">
+                            <h2>Test Yourself</h2>
+                            <p id="random-sentence" style="font-size: 20px;"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        
+            <div class="row justify-content-center mt-3">
+                <div class="col-md-12">
+                    <div class="bg-dark text-white" id="recognized-kanji-container">
+                        <div class="text-center" id="recognized-kanji-body">
+                            <h2>Your Recognized Kanji</h2>
+                            <button class="btn btn-success btn-lg" type="button" data-toggle="collapse" data-target="#known-kanji-list" aria-expanded="false" aria-controls="known-kanji-list">
+                                Show Known Kanji
+                            </button>
+                            <div class="collapse" id="known-kanji-list">
+                                <p id="kanji-description">Order - Kanji - Meaning - Reading</p>
+                                <ul id="known-kanji-list"></ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="nhk-news-card">
+            <h2>Passage containing Previous Kanji - Test your Reading</h2>
+            <div id="nhk-news">
+                <!-- NHK News content will be loaded here -->
+            </div>
+        </div>
+        
+
 
     <script src="script.js"></script>
+    
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>

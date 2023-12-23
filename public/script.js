@@ -17,13 +17,17 @@ async function getCurrentUser() {
                 const userJSON = await response.json();
                 console.log('User JSON:', userJSON);
                 // Hide the account and login boxes
-                hideAccountAndLoginBoxes();
+                //hideAccountAndLoginBoxes();
 
                 // Set the current user by username
                 setCurrentUser(username);
 
                 // Display a welcome message
-                displayWelcomeMessage(username);    
+                //displayWelcomeMessage(username); 
+                document.getElementById('username-card-display').innerText = username;   
+                const cardleveltext = document.getElementById('card-level-text');
+                cardleveltext.classList.remove('hidden')
+                //showLogoutButton();
 
                 return username;
             } else {
@@ -32,6 +36,7 @@ async function getCurrentUser() {
             }
         } else {
             console.log('No user found.');
+            //hideLogoutButton();
             return null;
         }
     } catch (error) {
@@ -41,7 +46,7 @@ async function getCurrentUser() {
 }
 
 
-document.addEventListener('DOMContentLoaded', getTokyoWeather);
+//document.addEventListener('DOMContentLoaded', getTokyoWeather);
 
 document.addEventListener('DOMContentLoaded', function () {
     // Check if the user is already logged in
@@ -51,6 +56,7 @@ document.addEventListener('DOMContentLoaded', function () {
     getRandomKanji();
 
     getKnownKanji();
+    
 
 
 });
@@ -75,15 +81,23 @@ async function getRandomKanji() {
         const response = await fetch('/getRandomKanji');
         const data = await response.json();
         console.log('Random Kanji:', data.random_kanji);
+        console.log('Random Sentence:', data.random_sentence);
+            // Replace 'yourRandomKanjiVariable' with the actual variable storing the random kanji
+        const randomKanji = data.random_kanji
+        fetchAndDisplayNHKNews(randomKanji);
+        
+        
 
 
         // Assuming you have an element with the ID 'random-kanji' in your HTML
         const randomKanjiElement = document.getElementById('random-kanji');
+        const randomSentenceElement = document.getElementById('random-sentence');
 
         // Display the fetched random kanji on the HTML element
         randomKanjiElement.setAttribute('data-kanji-info', JSON.stringify(data.random_kanji));
 
         randomKanjiElement.innerText = data.random_kanji[1];
+        randomSentenceElement.innerText = data.random_sentence;
 
         await getKnownKanji();
     } catch (error) {
@@ -103,6 +117,9 @@ async function checkLoggedInUser() {
 
         // Display a welcome message
         displayWelcomeMessage(currentUser.username);
+        showLogoutButton(); // Show logout button if a user is logged in
+        } else {
+        hideLogoutButton();
     }
     
 }
@@ -112,6 +129,15 @@ function generateUniqueId() {
     const randomNum = Math.floor(Math.random() * 1000); // You can adjust the range as needed
     return `${timestamp}_${randomNum}`;
 }
+
+function loginSuccessful() {
+    // Show the hidden elements
+    document.getElementById('level-text').classList.remove('hidden');
+    document.getElementById('buttons-container').classList.remove('hidden');
+    // Other login-related logic
+}
+
+
 // function storeUser(user) {
 
 //     fetch('http://localhost:3000/api/users', {
@@ -253,6 +279,8 @@ async function login() {
 
             // Display a welcome message
             displayWelcomeMessage(loginUsernameInput.value);
+
+            loginSuccessful()
         } else if (response.status === 401) {
             // Invalid username or password
             alert('Invalid username or password. Please try again.');
@@ -287,6 +315,13 @@ function getUserByUsername(username) {
 function setCurrentUser(username) {
     localStorage.setItem('current_user', username);
 }
+
+function logoutSuccessful() {
+    // Hide the elements
+    document.getElementById('level-text').classList.add('hidden');
+    document.getElementById('buttons-container').classList.add('hidden');
+    // Other logout-related logic
+}
 function logout() {
     // Clear the current user from local storage
     localStorage.removeItem('current_user');
@@ -297,6 +332,7 @@ function logout() {
 
     // Update the UI or perform any other necessary actions
     console.log('User logged out');
+    logoutSuccessful()
 }
 
 // function generateRandomKanji() {
@@ -376,6 +412,10 @@ async function getKnownKanji() {
 
                 updateLevel(flattenedList.length);
 
+                knownKanjiCount = flattenedList.length
+
+                // Get the current progress bar element
+                
                 // Assuming you have an element with the ID 'known-kanji-list' in your HTML
                 const knownKanjiListElement = document.getElementById('known-kanji-list');
 
@@ -414,6 +454,29 @@ async function recognizeKanji() {
         console.log(randomKanji)
         console.log(kanjiInfo + "kanjiinfo")
         console.log('Current User:', currentUser);
+        
+        const progressBar = document.getElementById('level-progress');
+
+        // Get the current progress value from the progress bar
+        let progress = parseInt(progressBar.style.width) || 0;
+
+        // Increment the progress by 10% for each recognized kanji
+        progress += 10;
+
+        // Ensure the progress does not exceed 100%
+        progress = Math.min(progress, 101);
+
+        // Update the progress bar width
+        progressBar.style.width = `${progress}%`;
+
+        // If the level has increased, reset the progress bar
+        if (progress > 100) {
+            // Reset the progress bar
+            progress = 0;
+            progressBar.style.width = '0%';
+        }
+
+
         if (currentUser) {
             // Make a request to the server to recognize and save known kanji
             console.log('Request Payload:', JSON.stringify({ user_id: currentUser, random_kanji: kanjiInfo }));
@@ -479,7 +542,103 @@ function updateLevel(knownKanjiCount) {
     }
 }
 
+async function showLogoutButton() {
+    document.getElementById('level-text').classList.remove('hidden');
+    document.getElementById('buttons-container').classList.remove('hidden');
+}
+
+// Function to hide the logout button and related elements
+async function hideLogoutButton() {
+    document.getElementById('level-text').classList.add('hidden');
+    document.getElementById('buttons-container').classList.add('hidden');
+}
+
+async function updateLogoutButtonVisibility() {
+    const userCardContainer = document.getElementById("user-card-container");
+    const leveltext = document.getElementById('level-text');
+    const logoutButton = document.getElementById('logoutButton');
+    const loginButton = document.getElementById('loginButton');
+    const createAccountButton = document.getElementById('createAccountButton');
+    const currentuser = await getCurrentUser();
+    if (currentuser) {
+        logoutButton.classList.remove('hidden');
+        loginButton.classList.add('hidden');
+        createAccountButton.classList.add('hidden');
+        //leveltext.classList.remove('hidden')
+        userCardContainer.classList.remove("hidden");
+    } else {
+        logoutButton.classList.add('hidden');
+        loginButton.classList.remove('hidden');
+        createAccountButton.classList.remove('hidden');
+        userCardContainer.classList.add("hidden");
+    }
+}
+function displayNHKNews(newsData) {
+    const nhkNewsElement = document.getElementById('nhk-news');
+
+    // Display the NHK news data
+    nhkNewsElement.textContent = newsData;
+}
+
+// Function to fetch and display NHK news
+async function fetchAndDisplayNHKNews(randomKanji) {
+    try {
+        // Make a GET request to the server to get NHK news based on the random kanji
+        console.log("HERHEHRE" + randomKanji)
+        const randomKan = randomKanji[1];
+        console.log("YEYEYE" + randomKan)
+        const response = await fetch(`/getNHKNews?randomKanji=${randomKan}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (response.ok) {
+            // If the response is successful, parse the JSON data
+            const newsData = await response.json();
+
+            // Log the received news data for debugging
+            console.log('Received NHK news data:', newsData);
+
+            // Check if the NHK news story is empty, indicating no news found
+            if (newsData.nhk_news_story === '') {
+                console.log('No NHK news found.');
+                // Handle this case as needed, e.g., display a message to the user
+            } else {
+                // Display NHK news at the bottom of the page
+                displayNHKNews(newsData.article_text);
+                console.log('Displayed NHK news successfully.');
+            }
+        } else {
+            // If the response is not successful, log the error
+            console.error('Failed to fetch NHK news:', response.statusText);
+        }
+    } catch (error) {
+        // Handle any errors that occur during the fetch operation
+        console.error('Error fetching NHK news:', error);
+    }
+}
+
+function displayLoadingMessage(durationInSeconds) {
+    const nhkNewsTitle = document.getElementById('nhk-news');
+
+    // Set the initial loading message
+    nhkNewsTitle.textContent = "Your Kanji related NHK News is loading...";
+
+    // After the specified duration, clear the loading message
+    setTimeout(() => {
+        nhkNewsTitle.textContent = "NHK News"; // Replace with your actual NHK News title
+    }, durationInSeconds * 1000); // Convert seconds to milliseconds
+}
+
+// Call the function with a delay of 7 seconds (adjust as needed)
+displayLoadingMessage(11);
+
+// Fetch and display NHK news when the page loads
+
+// Call the function when the page loads to set initial visibility
+updateLogoutButtonVisibility();
 
 // Add event listeners to the Recognize and Don't Recognize buttons
-document.getElementById('recognize-button').addEventListener('click', recognizeKanji);
-document.getElementById('dont-recognize-button').addEventListener('click', dontRecognizeKanji);
+

@@ -5,6 +5,14 @@ from Database import table_select, create_db_connection,save_known_kanji, get_kn
 from flask_cors import CORS
 import random
 import hashlib
+from kanji_templates import kanji_templates
+from bs4 import BeautifulSoup
+import requests
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.keys import Keys
+from bs4 import BeautifulSoup
+import time
 # import pymysql
 
 app = Flask(__name__,template_folder='public')
@@ -16,6 +24,19 @@ CITY = 'TOKYO'
 
 def kelvin_to_celsius(kelvin):
     return kelvin - 273.15
+
+def get_random_sentence_for_kanji(kanji):
+    # Check if the kanji is in the templates
+    if kanji in kanji_templates:
+        # Get the templates for the specified kanji
+        templates_for_kanji = kanji_templates[kanji]
+        
+        # Pick a random sentence from the templates
+        random_sentence = random.choice(templates_for_kanji)
+        
+        return random_sentence
+    else:
+        return "No templates available for this kanji."
 
 def get_username_by_id(user_id):
     # Establish a database connection
@@ -95,8 +116,10 @@ def get_random_kanji_api():
         # Choose a random kanji from the list
         random_kanji = random.choice(kanji_list)
 
+        random_sentence = get_random_sentence_for_kanji(random_kanji[1])
+
         # Return random kanji data as JSON
-        return jsonify({'random_kanji': random_kanji})
+        return jsonify({'random_kanji': random_kanji, 'random_sentence': random_sentence})
     except Exception as e:
         # Log the exception for further analysis
         print(f"An error occurred: {str(e)}")
@@ -251,6 +274,69 @@ def get_username():
              return jsonify(message='User not found'), 200 
     else:
         return jsonify(error='Missing user_id parameter'), 400
+    
+def get_nhk_article(kanji):
+    try:
+        # NHK Easy News URL with the current kanji
+        nhk_url = f'https://www3.nhk.or.jp/news/nsearch/?col=news&charset=utf-8&qi=3&qt={kanji}'
+
+        # Set up Chrome options for headless mode
+        chrome_options = Options()
+        chrome_options.add_argument('--headless')  # Run Chrome in headless mode
+
+        # Create a new instance of the Chrome driver with headless options
+        driver = webdriver.Chrome(options=chrome_options)
+
+        # Navigate to the NHK Easy News URL
+        driver.get(nhk_url)
+
+        # Wait for some time to let the page load (adjust as needed)
+        time.sleep(5)
+
+        # Get the page source after JavaScript has executed
+        page_source = driver.page_source
+
+        # Parse the HTML content of the page
+        soup = BeautifulSoup(page_source, 'html.parser')
+
+        # Find the section with class "search--items"
+        search_items_section = soup.find('section', class_='search--items')
+
+        if search_items_section:
+            # Find all list items within the section
+            list_items = search_items_section.find_all('li')
+
+            # Extract and concatenate the text from each search note
+            article_text = '\n'.join([item.find('p', class_='search-note').get_text(strip=True) if item.find('p', class_='search-note') else '' for item in list_items])
+
+            return article_text.strip()  # Strip leading/trailing whitespaces
+        else:
+            return "No search items found on the page."
+
+    except Exception as e:
+        print(f"An error occurred during NHK Easy News scraping: {str(e)}")
+        return "Failed to retrieve NHK Easy News article."
+
+    finally:
+        # Close the browser window
+        driver.quit()
+
+@app.route('/getNHKNews', methods=['GET'])
+def get_nhk_article_route():
+    try:
+        # Get the kanji from the request parameters
+        kanji = request.args.get('current_kanji')
+
+        # Call the function to get the NHK Easy News article
+        article_text = get_nhk_article(kanji)
+
+        # Return the NHK Easy News article text as JSON
+        return jsonify({'article_text': article_text})
+    except Exception as e:
+        print(f"An error occurred during NHK Easy News retrieval: {str(e)}")
+        return jsonify({'error': 'Internal Server Error'}), 500
+
+# ... (rest of your code)
 
 if __name__ == '__main__':
     app.run(port=5000)
