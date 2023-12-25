@@ -13,6 +13,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.keys import Keys
 from bs4 import BeautifulSoup
 import time
+import mysql.connector
 # import pymysql
 
 app = Flask(__name__,template_folder='public')
@@ -336,7 +337,44 @@ def get_nhk_article_route():
         print(f"An error occurred during NHK Easy News retrieval: {str(e)}")
         return jsonify({'error': 'Internal Server Error'}), 500
 
-# ... (rest of your code)
+@app.route('/getWanikanilevel', methods=['GET'])
+def getwanikanilevel():
+    try:
+        # Get the level from the request parameters
+        level = int(request.args.get('currentlevel'))
+
+        # Connect to MySQL Server
+        connection = mysql.connector.connect(
+            host = "localhost",
+            user = "root",
+            passwd = "349dsahoDSI3:",
+            database= "testdatabase"
+        )
+
+        # Create a cursor
+        cursor = connection.cursor(dictionary=True)
+
+        # Perform a query to get kanji between level 1 and the specified level
+        query = f"SELECT kanji FROM kanji_data WHERE level BETWEEN 1 AND {level}"
+        cursor.execute(query)
+
+        # Fetch all rows
+        kanji_data = cursor.fetchall()
+        kanji_list = [item["kanji"] for item in kanji_data]
+
+        print(f'Fetched kanji data: {kanji_list}')
+        # Close the cursor and connection
+        cursor.close()
+        connection.close()
+
+        # Return the result as JSON
+        return jsonify(kanji_list)
+
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
+       
+
 
 if __name__ == '__main__':
     app.run(port=5000)

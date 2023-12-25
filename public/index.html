@@ -204,6 +204,18 @@
     #nhk-news {
         color: black; /* Set the text color to black */
     }
+    .btn-custom {
+        background-color: #000000; /* Set your preferred darker black color */
+        color: white; /* Set text color to white or any contrasting color */
+    }
+    .btn-custom:hover {
+        background-color: #333333; /* Set a slightly lighter color for hover effect */
+    }
+    .highlight {
+    background-color: yellow; /* Change the background color as needed */
+    color: black; /* Change the text color as needed */
+    font-weight: bold; /* Optionally, make the text bold */
+}
 </style>
 </head>
 <body>
@@ -212,9 +224,10 @@
     <div class="container-fluid" id="header-container">
         <div class="row">
             <div class="col-lg-12" id="header-buttons">
-                <button id="loginButton" class="btn btn-secondary" onclick="window.location.href='login.html'">Login</button>
-                <button id="createAccountButton" class="btn btn-secondary ml-2" onclick="window.location.href='create-account.html'">Create Account</button>
-                <button id="logoutButton" class="btn btn-secondary ml-2 hidden" onclick="logout()">Logout</button>
+                <button id="loginButton" class="btn btn-custom" onclick="window.location.href='login.html'">Login</button>
+                <button id="createAccountButton" class="btn btn-custom ml-2" onclick="window.location.href='create-account.html'">Create Account</button>
+                <button id="logoutButton" class="btn btn-custom ml-2 hidden" onclick="logout()">Logout</button>
+                <button id="wanikaniConnectButton" class="btn btn-custom ml-2 hidden"  onclick="window.location.href='wanikani.html'">WanikaniConnect</button>
             </div>
             <div class="col">
                 <h3 id="title-display" class="text-center">Kanji Learner</h3>

@@ -1,4 +1,19 @@
 // public/script.js
+const currentPage = window.location.pathname;
+
+// Add a condition to exclude the WaniKani page
+if (currentPage !== '/wanikani.html') {
+    // Your general code goes here
+    console.log('Running script on non-WaniKani page');
+    // ...
+
+    // Example: Call functions or add general code
+    // getRandomKanji();
+} else {
+    console.log('Script not running on WaniKani page');
+}
+
+
 async function getCurrentUser() {
     try {
         const username = localStorage.getItem('current_user');
@@ -558,6 +573,7 @@ async function updateLogoutButtonVisibility() {
     const leveltext = document.getElementById('level-text');
     const logoutButton = document.getElementById('logoutButton');
     const loginButton = document.getElementById('loginButton');
+    const wanikaniConnectButton = document.getElementById('wanikaniConnectButton');
     const createAccountButton = document.getElementById('createAccountButton');
     const currentuser = await getCurrentUser();
     if (currentuser) {
@@ -566,27 +582,54 @@ async function updateLogoutButtonVisibility() {
         createAccountButton.classList.add('hidden');
         //leveltext.classList.remove('hidden')
         userCardContainer.classList.remove("hidden");
+        wanikaniConnectButton.classList.remove('hidden');
     } else {
         logoutButton.classList.add('hidden');
         loginButton.classList.remove('hidden');
         createAccountButton.classList.remove('hidden');
         userCardContainer.classList.add("hidden");
+        wanikaniConnectButton.classList.add('hidden');
     }
 }
-function displayNHKNews(newsData) {
+// function displayNHKNews(newsData) {
+//     const nhkNewsElement = document.getElementById('nhk-news');
+
+//     // Display the NHK news data
+//     nhkNewsElement.textContent = newsData;
+// }
+
+async function displayNHKNews(newsText, screenKanji) {
     const nhkNewsElement = document.getElementById('nhk-news');
 
-    // Display the NHK news data
-    nhkNewsElement.textContent = newsData;
+    // Clear the existing content
+    nhkNewsElement.innerHTML = '';
+
+    // Split the news text into characters
+    const newsCharacters = newsText.split('');
+    console.log("HEHERHERHEHRDIOASDSASAD",screenKanji)
+
+    // Create a new span element for each character
+    newsCharacters.forEach((character) => {
+        const span = document.createElement('span');
+        span.textContent = character;
+
+        // Check if the character is in the WaniKani kanji list
+        if (screenKanji && Array.isArray(screenKanji) && screenKanji.includes(character)) {
+            span.classList.add('highlight'); // Add a CSS class for highlighting
+        }
+
+        // Append the span element to the NHK news element
+        nhkNewsElement.appendChild(span);
+    });
 }
 
 // Function to fetch and display NHK news
-async function fetchAndDisplayNHKNews(randomKanji) {
+async function fetchAndDisplayNHKNews(randomKanji, screenKanji) {
     try {
         // Make a GET request to the server to get NHK news based on the random kanji
-        console.log("HERHEHRE" + randomKanji)
+        console.log("HERE" + randomKanji)
         const randomKan = randomKanji[1];
-        console.log("YEYEYE" + randomKan)
+        console.log("YES" + randomKan)
         const response = await fetch(`/getNHKNews?randomKanji=${randomKan}`, {
             method: 'GET',
             headers: {
@@ -607,7 +650,7 @@ async function fetchAndDisplayNHKNews(randomKanji) {
                 // Handle this case as needed, e.g., display a message to the user
             } else {
                 // Display NHK news at the bottom of the page
-                displayNHKNews(newsData.article_text);
+                displayNHKNews(newsData.article_text, screenKanji);
                 console.log('Displayed NHK news successfully.');
             }
         } else {

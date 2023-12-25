@@ -305,6 +305,22 @@ app.get('/getNHKNews', async (req, res) => {
     }
 });
 
+app.get('/getWanikanilevel', async (req, res) => {
+    try {
+        // Assuming you have the current kanji available in req.query.current_kanji
+        const currentlevel = req.query.level;
+        console.log("HERHERHEHSHHERRHE"+ currentlevel)
+        // Make a GET request to the Flask server to get NHK news
+        const response = await axios.get(`http://localhost:5000/getWanikanilevel?currentlevel=${currentlevel}`);
+
+        // Forward the NHK news data to the client
+        res.status(response.status).json(response.data);
+    } catch (error) {
+        console.error('Error fetching wanikanilevel:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
 
 
 app.listen(port, () => {
