@@ -598,35 +598,57 @@ async function updateLogoutButtonVisibility() {
 //     nhkNewsElement.textContent = newsData;
 // }
 
-async function displayNHKNews(newsText, screenKanji) {
+async function displayNHKNews(newsText, screenKanji, knownKanjiList) {
     const nhkNewsElement = document.getElementById('nhk-news');
 
     // Clear the existing content
     nhkNewsElement.innerHTML = '';
 
-    // Split the news text into characters
-    const newsCharacters = newsText.split('');
-    console.log("HEHERHERHEHRDIOASDSASAD",screenKanji)
+    // Split the news text into words
+    const newsWords = newsText.split(' ');
 
-    // Create a new span element for each character
-    newsCharacters.forEach((character) => {
-        const span = document.createElement('span');
-        span.textContent = character;
+    // Create a new span element for each word
+    for (const word of newsWords) {
+        const wordSpan = document.createElement('span');
 
-        // Check if the character is in the WaniKani kanji list
-        if (screenKanji && Array.isArray(screenKanji) && screenKanji.includes(character)) {
-            span.classList.add('highlight'); // Add a CSS class for highlighting
+        // Split the word into characters
+        const wordCharacters = word.split('');
+
+        // Create a new span element for each character in the word
+        for (const character of wordCharacters) {
+            const span = document.createElement('span');
+            span.textContent = character;
+
+            // Check if the character is in the WaniKani kanji list
+            if (screenKanji && Array.isArray(screenKanji) && screenKanji.includes(character)) {
+                span.classList.add('highlight'); // Add a CSS class for highlighting
+            }
+
+            // Check if the character is in the known kanji list
+            if (knownKanjiList && Array.isArray(knownKanjiList) && knownKanjiList.includes(character)) {
+                span.classList.add('highlight-known'); // Add a different CSS class for highlighting known kanji
+            }
+
+            // Append the span element to the word span
+            wordSpan.appendChild(span);
         }
 
-        // Append the span element to the NHK news element
-        nhkNewsElement.appendChild(span);
-    });
+        // Add a space between words
+        const spaceSpan = document.createElement('span');
+        spaceSpan.textContent = ' ';
+
+        // Append the word span and space span to the NHK news element
+        nhkNewsElement.appendChild(wordSpan);
+        nhkNewsElement.appendChild(spaceSpan);
+    }
 }
 
 // Function to fetch and display NHK news
 async function fetchAndDisplayNHKNews(randomKanji, screenKanji) {
+
     try {
         // Make a GET request to the server to get NHK news based on the random kanji
+        const knownKanjiList = await getKnownKanji();
         console.log("HERE" + randomKanji)
         const randomKan = randomKanji[1];
         console.log("YES" + randomKan)
@@ -650,7 +672,7 @@ async function fetchAndDisplayNHKNews(randomKanji, screenKanji) {
                 // Handle this case as needed, e.g., display a message to the user
             } else {
                 // Display NHK news at the bottom of the page
-                displayNHKNews(newsData.article_text, screenKanji);
+                displayNHKNews(newsData.article_text, screenKanji,knownKanjiList);
                 console.log('Displayed NHK news successfully.');
             }
         } else {
@@ -662,6 +684,8 @@ async function fetchAndDisplayNHKNews(randomKanji, screenKanji) {
         console.error('Error fetching NHK news:', error);
     }
 }
+
+
 
 function displayLoadingMessage(durationInSeconds) {
     const nhkNewsTitle = document.getElementById('nhk-news');
