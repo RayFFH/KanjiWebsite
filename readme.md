@@ -1,3 +1,4 @@
+![image](https://github.com/RayFFH/KanjiWebsite/assets/57190209/1963eb37-3020-4c7b-acb9-c430daf01dae)
 
 I showcased full-stack proficiency in developing the Kanji Learner web app, integrating Node.js, Express, and MySQL for a robust backend. Leveraging NHK News and Wanikani APIs enhanced the user experience, providing real-time data for a richer learning journey.
 
