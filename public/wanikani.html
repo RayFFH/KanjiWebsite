@@ -14,92 +14,95 @@
                     <label for="wanikaniApiKey">Enter Your WaniKani API Key:</label>
                     <input type="text" class="form-control" id="wanikaniApiKey" placeholder="Enter API Key">
                 </div>
-                <button class="btn btn-success" onclick="saveApiKey()">Enter</button>
                 <button class="btn btn-secondary ml-2" onclick="returnToMainMenu()">Return to Main Menu</button>
+                <button class="btn btn-success" onclick="saveApiKey()">Enter</button>
             </div>
         </div>
     </div>
 
     <script>
-        async function fetchLevelData(apiToken) {
-    try {
-        const apiEndpointPath = 'user';
-        const requestHeaders = new Headers({
-            'Wanikani-Revision': '20170710',
-            Authorization: 'Bearer ' + apiToken,
-        });
-        const apiEndpoint = new Request('https://api.wanikani.com/v2/' + apiEndpointPath, {
-            method: 'GET',
-            headers: requestHeaders
-        });
 
-        // Fetch user level data
-        const response = await fetch(apiEndpoint);
-        const responseData = await response.json();
-        console.log("level:", responseData.data.level)
+//     let screenKanji = null;
+//         async function fetchLevelData(apiToken) {
+//     try {
+//         const apiEndpointPath = 'user';
+//         const requestHeaders = new Headers({
+//             'Wanikani-Revision': '20170710',
+//             Authorization: 'Bearer ' + apiToken,
+//         });
+//         const apiEndpoint = new Request('https://api.wanikani.com/v2/' + apiEndpointPath, {
+//             method: 'GET',
+//             headers: requestHeaders
+//         });
 
-        if (responseData.data && responseData.data.level !== undefined) {
-            const userLevel = responseData.data.level;
-            console.log('User Level:', userLevel);
+//         // Fetch user level data
+//         const response = await fetch(apiEndpoint);
+//         const responseData = await response.json();
+//         console.log("level:", responseData.data.level)
 
-            // Convert userLevel to a string
-            const levelRequest = userLevel.toString();
+//         if (responseData.data && responseData.data.level !== undefined) {
+//             const userLevel = responseData.data.level;
+//             console.log('User Level:', userLevel);
 
-            // Fetch level data based on the user's level
-            const levelResponse = await fetch(`/getWanikanilevel?level=${levelRequest}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
+//             // Convert userLevel to a string
+//             const levelRequest = userLevel.toString();
 
-            if (levelResponse.ok) {
-                const levelData = await levelResponse.json();
-                console.log('Received level data:', levelData);
-                var screenKanji = levelData
-                // Handle the received data accordingly
-            } else {
-                console.error('Failed to fetch kanji for level:', levelResponse.statusText);
-            }
-        } else {
-            console.error('Level not found in response data.');
-        }
-    } catch (error) {
-        console.error('Error fetching data:', error);
-    }
-}
+//             // Fetch level data based on the user's level
+//             const levelResponse = await fetch(`/getWanikanilevel?level=${levelRequest}`, {
+//                 method: 'GET',
+//                 headers: {
+//                     'Content-Type': 'application/json',
+//                 },
+//             });
+
+//             if (levelResponse.ok) {
+//                 const levelData = await levelResponse.json();
+//                 console.log('Received level data:', levelData);
+//                 screenKanji = levelData
+//                 console.log('Received level data 3432ewda:', screenKanji);
+//                 // Handle the received data accordingly
+//             } else {
+//                 console.error('Failed to fetch kanji for level:', levelResponse.statusText);
+//             }
+//         } else {
+//             console.error('Level not found in response data.');
+//         }
+//     } catch (error) {
+//         console.error('Error fetching data:', error);
+//     }
+// }
     
-        async function saveApiKey() {
-            const apiToken = document.getElementById('wanikaniApiKey').value;
-            await fetchLevelData(apiToken);
-        }
+//         async function saveApiKey() {
+//             const apiToken = document.getElementById('wanikaniApiKey').value;
+//             await fetchLevelData(apiToken);
+//         }
 
 
-        async function returnToMainMenu() {
-            // Redirect to index.html
-            window.location.href = 'index.html';
-        }
-        document.querySelector('.btn-success').addEventListener('click', saveApiKey);
-        //document.querySelector('.btn-secondary').addEventListener('click', returnToMainMenu);
+//         async function returnToMainMenu() {
+//             // Redirect to index.html
+//             window.location.href = 'index.html';
+//         }
+//         document.querySelector('.btn-success').addEventListener('click', saveApiKey);
+//         //document.querySelector('.btn-secondary').addEventListener('click', returnToMainMenu);
     
-        // ... (other script functions)
-        window.addEventListener('DOMContentLoaded', function() {
-            // Check the current page URL
-            const currentPage = window.location.pathname;
+//         // ... (other script functions)
+//         window.addEventListener('DOMContentLoaded', function() {
+//             // Check the current page URL
+//             const currentPage = window.location.pathname;
 
-            // Add a condition to exclude the execution of script.js
-            if (currentPage !== '/wanikani.html') {
-                // Create a script element dynamically
-                const scriptElement = document.createElement('script');
+//             // Add a condition to exclude the execution of script.js
+//             if (currentPage !== '/wanikani.html') {
+//                 // Create a script element dynamically
+//                 const scriptElement = document.createElement('script');
                 
-                // Set the source attribute to your script.js file
-                scriptElement.src = 'path/to/script.js';
+//                 // Set the source attribute to your script.js file
+//                 scriptElement.src = 'path/to/script.js';
 
-                // Append the script element to the document body
-                document.body.appendChild(scriptElement);
-            }
-        });
+//                 // Append the script element to the document body
+//                 document.body.appendChild(scriptElement);
+//             }
+//         });
     </script>
-    <!-- Your other script tags -->
 </body>
+<script defer src="script.js"></script>
 </html>
