@@ -14,6 +14,13 @@ if (currentPage !== '/wanikani.html') {
 }
 
 
+document.addEventListener('DOMContentLoaded', function () {
+    updateLogoutButtonVisibility();
+    displayLoadingMessage(11);
+    // ... (other initialization code)
+});
+
+
 async function getCurrentUser() {
     try {
         const username = localStorage.getItem('current_user');
@@ -136,7 +143,7 @@ async function checkLoggedInUser() {
         } else {
         hideLogoutButton();
     }
-    
+    updateLogoutButtonVisibility();
 }
 
 function generateUniqueId() {
@@ -456,6 +463,8 @@ async function getKnownKanji() {
 async function recognizeKanji() {
     try {
         // Assuming you have an element with the ID 'random-kanji' in your HTML
+        displayLoadingMessage(11);
+        //displayLoadingMessage(11);
         const randomKanjiElement = document.getElementById('random-kanji');
 
         // Get the currently displayed random kanji
@@ -520,6 +529,7 @@ async function recognizeKanji() {
                 console.log('Recognized kanji and updated known kanji list.');
                 // Fetch and display the updated list of known kanji
                 await getKnownKanji();
+                await fetchAndDisplayNHKNews(randomKanji);
                 console.log("Done")
             } else {
                 console.error('Failed to recognize kanji:', response.statusText);
@@ -527,6 +537,7 @@ async function recognizeKanji() {
         } else {
             alert('Please log in to recognize kanji.');
         }
+
     } catch (error) {
         console.error('Error recognizing kanji:', error);
     }
@@ -569,6 +580,7 @@ async function hideLogoutButton() {
 }
 
 async function updateLogoutButtonVisibility() {
+    console.log("Current UserYOOOOOOOOOOO ITS HEREEE Status:");
     const userCardContainer = document.getElementById("user-card-container");
     const leveltext = document.getElementById('level-text');
     const logoutButton = document.getElementById('logoutButton');
@@ -599,7 +611,6 @@ async function updateLogoutButtonVisibility() {
 // }
 
 async function displayNHKNews(newsText, knownKanjiList) {
-
     const nhkNewsElement = document.getElementById('nhk-news');
 
     // Clear the existing content
@@ -607,6 +618,12 @@ async function displayNHKNews(newsText, knownKanjiList) {
 
     // Split the news text into words
     const newsWords = newsText.split(' ');
+
+    // Check if screenKanji is available in local storage
+    const storedScreenKanji = localStorage.getItem('screenKanji');
+
+    // Use screenKanji from local storage if available; otherwise, use an empty array
+    const screenKanji = storedScreenKanji ? JSON.parse(storedScreenKanji) : [];
 
     // Create a new span element for each word
     for (const word of newsWords) {
@@ -703,90 +720,177 @@ function displayLoadingMessage(durationInSeconds) {
 
 setInterval(() => {
     console.log('screenKanji from script.js:', screenKanji);
+    
 }, 10000); // Log every 5 seconds
 
 console.log("YO HERE YO YO :", window.screenKanji);
 
 let screenKanji = null;
-        async function fetchLevelData(apiToken) {
+async function fetchLevelData(apiToken) {
     try {
-        const apiEndpointPath = 'user';
-        const requestHeaders = new Headers({
-            'Wanikani-Revision': '20170710',
-            Authorization: 'Bearer ' + apiToken,
-        });
-        const apiEndpoint = new Request('https://api.wanikani.com/v2/' + apiEndpointPath, {
+    const apiEndpointPath = 'user';
+    const requestHeaders = new Headers({
+        'Wanikani-Revision': '20170710',
+        Authorization: 'Bearer ' + apiToken,
+    });
+    const apiEndpoint = new Request('https://api.wanikani.com/v2/' + apiEndpointPath, {
+        method: 'GET',
+        headers: requestHeaders
+    });
+
+    // Fetch user level data
+    const response = await fetch(apiEndpoint);
+    const responseData = await response.json();
+    console.log("level:", responseData.data.level)
+
+    if (responseData.data && responseData.data.level !== undefined) {
+        const userLevel = responseData.data.level;
+        console.log('User Level:', userLevel);
+
+        // Convert userLevel to a string
+        const levelRequest = userLevel.toString();
+
+        // Fetch level data based on the user's level
+        const levelResponse = await fetch(`/getWanikanilevel?level=${levelRequest}`, {
             method: 'GET',
-            headers: requestHeaders
+            headers: {
+                'Content-Type': 'application/json',
+            },
         });
 
-        // Fetch user level data
-        const response = await fetch(apiEndpoint);
-        const responseData = await response.json();
-        console.log("level:", responseData.data.level)
+        if (levelResponse.ok) {
+            const levelData = await levelResponse.json();
+            console.log('Received level data:', levelData);
+            screenKanji = levelData
+            localStorage.setItem('screenKanji', JSON.stringify(screenKanji));
 
-        if (responseData.data && responseData.data.level !== undefined) {
-            const userLevel = responseData.data.level;
-            console.log('User Level:', userLevel);
-
-            // Convert userLevel to a string
-            const levelRequest = userLevel.toString();
-
-            // Fetch level data based on the user's level
-            const levelResponse = await fetch(`/getWanikanilevel?level=${levelRequest}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
-
-            if (levelResponse.ok) {
-                const levelData = await levelResponse.json();
-                console.log('Received level data:', levelData);
-                screenKanji = levelData
-                console.log('Received level data 3432ewda:', screenKanji);
-                // Handle the received data accordingly
-            } else {
-                console.error('Failed to fetch kanji for level:', levelResponse.statusText);
-            }
+            console.log('Received level data:', screenKanji);
+            // Handle the received data accordingly
         } else {
-            console.error('Level not found in response data.');
+            console.error('Failed to fetch kanji for level:', levelResponse.statusText);
         }
+    } else {
+        console.error('Level not found in response data.');
+    }
     } catch (error) {
-        console.error('Error fetching data:', error);
+    console.error('Error fetching data:', error);
     }
 }
-    
-        async function saveApiKey() {
-            const apiToken = document.getElementById('wanikaniApiKey').value;
-            await fetchLevelData(apiToken);
+
+// async function saveApiKey() {
+//     const apiToken = document.getElementById('wanikaniApiKey').value;
+//     await fetchLevelData(apiToken);
+// }
+
+
+async function returnToMainMenu() {
+    // Redirect to index.html
+    window.location.href = 'index.html';
+}
+
+
+document.querySelector('.btn-success').addEventListener('click', saveApiKey);
+//document.querySelector('.btn-secondary').addEventListener('click', returnToMainMenu);
+
+// ... (other script functions)
+window.addEventListener('DOMContentLoaded', function() {
+    // Check the current page URL
+    const currentPage = window.location.pathname;
+
+    // Add a condition to exclude the execution of script.js
+    if (currentPage !== '/wanikani.html') {
+        // Create a script element dynamically
+        const scriptElement = document.createElement('script');
+        
+        // Set the source attribute to your script.js file
+        scriptElement.src = 'script.js';
+
+        // Append the script element to the document body
+        document.body.appendChild(scriptElement);
+    }
+});
+
+window.addEventListener('DOMContentLoaded', function() {
+    // Check the current page URL
+    const currentPage = window.location.pathname;
+
+    // Add a condition to exclude the execution of script.js
+    if (currentPage !== '/wanikani.html') {
+        // Retrieve screenKanji from local storage
+        const storedScreenKanji = localStorage.getItem('screenKanji');
+        
+        // Parse the stored screenKanji (assuming it's a JSON object)
+        if (storedScreenKanji) {
+            screenKanji = JSON.parse(storedScreenKanji);
         }
 
-
-        async function returnToMainMenu() {
-            // Redirect to index.html
-            window.location.href = 'index.html';
-        }
-        document.querySelector('.btn-success').addEventListener('click', saveApiKey);
-        //document.querySelector('.btn-secondary').addEventListener('click', returnToMainMenu);
-    
-        // ... (other script functions)
-        window.addEventListener('DOMContentLoaded', function() {
-            // Check the current page URL
-            const currentPage = window.location.pathname;
-
-            // Add a condition to exclude the execution of script.js
-            if (currentPage !== '/wanikani.html') {
-                // Create a script element dynamically
-                const scriptElement = document.createElement('script');
+        // Create a script element dynamically
+        const scriptElement = document.createElement('script');
                 
-                // Set the source attribute to your script.js file
-                scriptElement.src = 'script.js';
+        // Set the source attribute to your script.js file
+        scriptElement.src = 'script.js';
 
-                // Append the script element to the document body
-                document.body.appendChild(scriptElement);
-            }
-        });
+        // Append the script element to the document body
+        document.body.appendChild(scriptElement);
+    }
+});
+
+// ... (your other functions)
+
+async function saveApiKey() {
+    const apiToken = document.getElementById('wanikaniApiKey').value;
+    await fetchLevelData(apiToken);
+
+    // Check if screenKanji contains kanji characters
+    if (screenKanji && Array.isArray(screenKanji) && screenKanji.some(character => isKanji(character))) {
+        // Redirect to index.html
+        window.location.href = 'index.html';
+    } else {
+        alert('No kanji characters found in screenKanji. Please try again.');
+    }
+}
+
+function isKanji(character) {
+    // Replace this with your logic to determine if a character is a kanji character
+    // For simplicity, let's assume any character with a Unicode code point greater than 0x4e00 is a kanji character
+    return character.charCodeAt(0) > 0x4e00;
+}
+
+async function returnToMainMenu() {
+    // Redirect to index.html
+    window.location.href = 'index.html';
+}
+
+function handleEnterKey(event) {
+    if (event.key === 'Enter') {
+        // If Enter key is pressed, call saveApiKey function
+        saveApiKey();
+    }
+}
+
+document.querySelector('.btn-success').addEventListener('click', saveApiKey);
+document.querySelector('.btn-secondary').addEventListener('click', returnToMainMenu);
+
+// ... (other script functions)
+window.addEventListener('DOMContentLoaded', function () {
+    // Check the current page URL
+    const currentPage = window.location.pathname;
+
+    // Add a condition to exclude the execution of script.js
+    if (currentPage !== '/wanikani.html') {
+        // Create a script element dynamically
+        const scriptElement = document.createElement('script');
+
+        // Set the source attribute to your script.js file
+        scriptElement.src = 'path/to/script.js';
+
+        // Append the script element to the document body
+        document.body.appendChild(scriptElement);
+    }
+});
+
+
+
 
 // async function saveApiKey() {
 //     const apiToken = document.getElementById('wanikaniApiKey').value;
@@ -796,12 +900,12 @@ let screenKanji = null;
 //     //fetchAndDisplayNHKNews(screenKanji);
 // }
 // Call the function with a delay of 7 seconds (adjust as needed)
-displayLoadingMessage(11);
+
 
 // Fetch and display NHK news when the page loads
 
 // Call the function when the page loads to set initial visibility
-updateLogoutButtonVisibility();
+
 
 // Add event listeners to the Recognize and Don't Recognize buttons
 

@@ -88,7 +88,7 @@ def get_known_kanji(connection, user_id):
                 return []
         
         cursor = connection.cursor()
-        print(user_id)
+        print("We are here right now in the databse" + user_id)
         # Define the SQL query to fetch known kanji for a specific user
 
         
