@@ -2,6 +2,8 @@
 
 // Assuming you have a create_db_connection function to establish a database connection
 
+const mysql = require('mysql2/promise'); 
+
 async function getUserByUsername(username) {
     const connection = create_db_connection("localhost", "root", "349dsahoDSI3:", "testdatabase");
 
