@@ -6,10 +6,8 @@ The frontend, designed with Bootstrap, reflects my attention to UI aesthetics an
 
 Dynamic features, including kanji tracking and level progression, highlight my expertise in asynchronous operations with JavaScript. The Kanji Learner project exemplifies my ability to deliver secure, user-friendly web applications, blending functionality and design seamlessly.
 
-*******************************************
 <h2>NOW A FUNCTIONAL DYNAMIC WEBSITE HOSTED ON AZURE</h2>
 https://kanjilearner.azurewebsites.net/
-*******************************************
 
 Hosted on Microsoft Azure:
 Uses Two Webapps that communicate with each other
