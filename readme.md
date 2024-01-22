@@ -19,11 +19,9 @@
 *** https://www.markdownguide.org/basic-syntax/#reference-style-links
 -->
 [![Contributors][contributors-shield]][contributors-url]
-https://github.com/RayFFH/KanjiWebsite/graphs/contributors/
 [![Forks][forks-shield]][forks-url]
 [![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
-[![MIT License][license-shield]][license-url]
 [![LinkedIn][linkedin-shield]][linkedin-url]
 
 
@@ -34,7 +32,7 @@ https://github.com/RayFFH/KanjiWebsite/graphs/contributors/
 <h3 align="center">Kanji Learner</h3>
 
   <p align="center">
-    project_description
+    Kanji App which generates japanese text based off the kanji the user recognizes
     <br />
     <a href="https://github.com/RayFFH/KanjiWebsite/blob/main/readme.md"><strong>Explore the docs »</strong></a>
     <br />
@@ -237,16 +235,15 @@ List of websites i took inspiration from
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[contributors-shield]: https://img.shields.io/github/contributors/RayFHH/KanjiWebsite.svg?style=for-the-badge
+[contributors-shield]: https://img.shields.io/github/contributors/RayFFH/KanjiWebsite?style=for-the-badge
 [contributors-url]: https://github.com/RayFFH/KanjiWebsite/graphs/contributors/
-[forks-shield]: https://img.shields.io/github/forks/github_username/repo_name.svg?style=for-the-badge
-[forks-url]: https://github.com/github_username/repo_name/network/members
-[stars-shield]: https://img.shields.io/github/stars/github_username/repo_name.svg?style=for-the-badge
+[forks-shield]: https://img.shields.io/github/forks/RayFFH/KanjiWebsite?style=for-the-badge
+[forks-url]: https://github.com/RayFFH/KanjiWebsite/network/members
+[stars-shield]: https://img.shields.io/github/stars/RayFFH/KanjiWebsite?style=for-the-badge
 [stars-url]: https://github.com/RayFFH/KanjiWebsite/stargazers
-[issues-shield]: https://img.shields.io/github/issues/github_username/repo_name.svg?style=for-the-badge
+[issues-shield]: https://img.shields.io/github/issues/RayFFH/KanjiWebsite.svg?style=for-the-badge
 [issues-url]: https://github.com/RayFFH/KanjiWebsite/issues
-[license-shield]: https://img.shields.io/github/license/github_username/repo_name.svg?style=for-the-badge
-[license-url]: https://github.com/github_username/repo_name/blob/master/LICENSE.txt
+
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://www.linkedin.com/in/phoenixsmart/
 [product-screenshot]: images/screenshot.png
