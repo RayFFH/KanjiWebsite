@@ -19,6 +19,7 @@
 *** https://www.markdownguide.org/basic-syntax/#reference-style-links
 -->
 [![Contributors][contributors-shield]][contributors-url]
+https://github.com/RayFFH/KanjiWebsite/graphs/contributors/
 [![Forks][forks-shield]][forks-url]
 [![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
@@ -148,10 +149,22 @@ if you already know around 200 kanji
 
 <!-- USAGE EXAMPLES -->
 ## Usage
-
-Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
-
-_For more examples, please refer to the [Documentation](https://example.com)_
+ ```
+app.post('/saveKnownKanji', async (req, res) => {
+    try {
+        const response = await axios.post('http://localhost:5000/saveKnownKanji', {
+            user_id: req.body.user_id,
+            kanji: req.body.kanji,
+        });
+        res.json(response.data);
+    } catch (error) {
+        console.error('Error saving known kanji:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+ ```
+App Backend works by having expresss.js server to communicate with a flask server.
+The data retrieval and SQL queries are done within the flask server
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -160,12 +173,17 @@ _For more examples, please refer to the [Documentation](https://example.com)_
 <!-- ROADMAP -->
 ## Roadmap
 
-- [ ] Feature 1
-- [ ] Feature 2
-- [ ] Feature 3
-    - [ ] Nested Feature
+- [x] Hosted and deployed on azure
+- [x] Connected to azure SQL databse
+- [x] Allows users to login and sign up
+- [x] Randomizes kanji
+- [x] Allows users to recognise kanji
+- [x] Extracts Text containing user's recognised kanji
+- [x] Highlight kanji that is known on extracted text
+- [ ] Use jissho API for dictionary function
+- [ ] Read allowed Kanji for visually impaired users
+- [ ] Increase loading speeds on azure website
 
-See the [open issues](https://github.com/github_username/repo_name/issues) for a full list of proposed features (and known issues).
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -174,15 +192,12 @@ See the [open issues](https://github.com/github_username/repo_name/issues) for a
 <!-- CONTRIBUTING -->
 ## Contributing
 
-Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
-
-If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
-Don't forget to give the project a star! Thanks again!
+If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also email me at phoenix222smart@gmail.com if you want to discuss more.
 
 1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
+2. Create your Feature Branch (`git checkout -b feature`)
+3. Commit your Changes (`git commit -m 'Add some Feature'`)
+4. Push to the Branch (`git push origin AmazingFeature`)
 5. Open a Pull Request
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -201,9 +216,9 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 <!-- CONTACT -->
 ## Contact
 
-Your Name - [@twitter_handle](https://twitter.com/twitter_handle) - email@email_client.com
+Phoenix Smart - phoenix222smart@gmail.com
+Linkedin - https://www.linkedin.com/in/phoenixsmart/
 
-Project Link: [https://github.com/github_username/repo_name](https://github.com/github_username/repo_name)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -211,10 +226,10 @@ Project Link: [https://github.com/github_username/repo_name](https://github.com/
 
 <!-- ACKNOWLEDGMENTS -->
 ## Acknowledgments
+List of websites i took inspiration from
+* Wanikani
+* Anki
 
-* []()
-* []()
-* []()
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -223,7 +238,7 @@ Project Link: [https://github.com/github_username/repo_name](https://github.com/
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
 [contributors-shield]: https://img.shields.io/github/contributors/RayFHH/KanjiWebsite.svg?style=for-the-badge
-[contributors-url]: https://github.com/RayFFH/KanjiWebsite/graphs/contributors
+[contributors-url]: https://github.com/RayFFH/KanjiWebsite/graphs/contributors/
 [forks-shield]: https://img.shields.io/github/forks/github_username/repo_name.svg?style=for-the-badge
 [forks-url]: https://github.com/github_username/repo_name/network/members
 [stars-shield]: https://img.shields.io/github/stars/github_username/repo_name.svg?style=for-the-badge
@@ -251,37 +266,6 @@ Project Link: [https://github.com/github_username/repo_name](https://github.com/
 [Bootstrap-url]: https://getbootstrap.com
 [JQuery.com]: https://img.shields.io/badge/jQuery-0769AD?style=for-the-badge&logo=jquery&logoColor=white
 [JQuery-url]: https://jquery.com 
-[python] : https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54
-[html]: https://img.shields.io/badge/HTML-239120?style=for-the-badge&logo=html5&logoColor=white
-[nodejs]:https://img.shields.io/badge/Node.js-43853D?style=for-the-badge&logo=node.js&logoColor=white
-[express]https://img.shields.io/badge/Express.js-404D59?style=for-the-badge
-[bootstrap]https://img.shields.io/badge/Bootstrap-563D7C?style=for-the-badge&logo=bootstrap&logoColor=white
-[flask]: https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=flask&logoColor=white
-[postgres]: https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white
-
-![image](https://github.com/RayFFH/KanjiWebsite/assets/57190209/1963eb37-3020-4c7b-acb9-c430daf01dae)
-
-I showcased full-stack proficiency in developing the Kanji Learner web app, integrating Node.js, Express, and MySQL for a robust backend. Leveraging NHK News and Wanikani APIs enhanced the user experience, providing real-time data for a richer learning journey.
-
-The frontend, designed with Bootstrap, reflects my attention to UI aesthetics and responsiveness. Secure user authentication, employing practices like password hashing, underscores my commitment to privacy.
-
-Dynamic features, including kanji tracking and level progression, highlight my expertise in asynchronous operations with JavaScript. The Kanji Learner project exemplifies my ability to deliver secure, user-friendly web applications, blending functionality and design seamlessly.
-
-<h2>NOW A FUNCTIONAL DYNAMIC WEBSITE HOSTED ON AZURE</h2>
-https://kanjilearner.azurewebsites.net/
-
-Hosted on Microsoft Azure:
-Uses Two Webapps that communicate with each other
-One Webapp Runs on Express while the other runs on flask
-Flask web app communicates with Azure Sql Database
-Environment packes are installed in package.json for ExpressApp and requirements.txt for flask app
-
-Limitations from hosting on microsoft Azure:
-Selenium module is not supported on azure and most cloud Paas Services therefore that functionaility has been removed
-Having an Iaas environent or running selenium on a virtual machine would be a possible solution.
-
-  
-
 
  
 
