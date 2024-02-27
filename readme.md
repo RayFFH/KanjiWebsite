@@ -37,7 +37,7 @@
     <a href="https://github.com/RayFFH/KanjiWebsite/blob/main/readme.md"><strong>Explore the docs »</strong></a>
     <br />
     <br />
-    <a href="https://kanjilearner.azurewebsites.net">View Demo</a>
+    <a href="https://kanji-dictionary.onrender.com/">View Demo</a>
     ·
     <a href="https://github.com/RayFFH/KanjiWebsite/issues">Report Bug</a>
     ·
