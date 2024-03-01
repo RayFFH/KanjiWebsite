@@ -145,25 +145,7 @@ if you already know around 200 kanji
 
 
 <!-- USAGE EXAMPLES -->
-## Usage
- ```
-app.post('/saveKnownKanji', async (req, res) => {
-    try {
-        const response = await axios.post('http://localhost:5000/saveKnownKanji', {
-            user_id: req.body.user_id,
-            kanji: req.body.kanji,
-        });
-        res.json(response.data);
-    } catch (error) {
-        console.error('Error saving known kanji:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
-});
- ```
-App Backend works by having expresss.js server to communicate with a flask server.
-The data retrieval and SQL queries are done within the flask server
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
 
