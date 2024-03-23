@@ -159,7 +159,7 @@ if you already know around 200 kanji
 - [x] Allows users to recognise kanji
 - [x] Extracts Text containing user's recognised kanji
 - [x] Highlight kanji that is known on extracted text
-- [ ] Use jissho API for dictionary function
+- [x] Added dictionary function
 - [ ] Read allowed Kanji for visually impaired users
 - [ ] Increase loading speeds on azure website
 
